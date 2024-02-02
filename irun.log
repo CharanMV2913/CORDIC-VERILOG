@@ -1,0 +1,49 @@
+irun(64): 15.20-s086: (c) Copyright 1995-2020 Cadence Design Systems, Inc.
+TOOL:	irun(64)	15.20-s086: Started on Feb 02, 2024 at 13:26:55 IST
+irun
+	-access +rwc
+	Cordic.v
+file: Cordic.v
+typedef logic [PRECISION:0] XYVector [0:PIPELINE];
+                                   |
+ncvlog: *E,EXPLPA (Cordic.v,18|35): expecting a left parenthesis ('(') [12.1.2][7.1(IEEE)].
+typedef logic [PRECISION:0] XYVector [0:PIPELINE];
+                                                 |
+ncvlog: *E,EXPLPA (Cordic.v,18|49): expecting a left parenthesis ('(') [12.1.2][7.1(IEEE)].
+typedef logic [ANG-1:0] ZVector [0:PIPELINE];
+                              |
+ncvlog: *E,EXPLPA (Cordic.v,19|30): expecting a left parenthesis ('(') [12.1.2][7.1(IEEE)].
+typedef logic [ANG-1:0] ZVector [0:PIPELINE];
+                                            |
+ncvlog: *E,EXPLPA (Cordic.v,19|44): expecting a left parenthesis ('(') [12.1.2][7.1(IEEE)].
+module CordicPipe (
+     |
+ncvlog: *E,EXPENM (Cordic.v,22|5): expecting the keyword 'endmodule' [12.1(IEEE)].
+	module worklib.Cordic:v
+		errors: 5, warnings: 0
+    input [PRECISION:0] Xi,
+                   |
+ncvlog: *E,UNDIDN (Cordic.v,25|19): 'PRECISION': undeclared identifier [12.5(IEEE)].
+    input [PRECISION:0] Yi,
+                   |
+ncvlog: *E,UNDIDN (Cordic.v,26|19): 'PRECISION': undeclared identifier [12.5(IEEE)].
+    input [ANG-1:0] Zi,
+             |
+ncvlog: *E,UNDIDN (Cordic.v,27|13): 'ANG': undeclared identifier [12.5(IEEE)].
+    output reg [PRECISION:0] Xo,
+                        |
+ncvlog: *E,UNDIDN (Cordic.v,28|24): 'PRECISION': undeclared identifier [12.5(IEEE)].
+    output reg [PRECISION:0] Yo,
+                        |
+ncvlog: *E,UNDIDN (Cordic.v,29|24): 'PRECISION': undeclared identifier [12.5(IEEE)].
+    output reg [ANG-1:0] Zo
+                  |
+ncvlog: *E,UNDIDN (Cordic.v,30|18): 'ANG': undeclared identifier [12.5(IEEE)].
+	module worklib.CordicPipe:v
+		errors: 6, warnings: 0
+reg [PRECISION:0] X [0:PIPELINE];
+  |
+ncvlog: *E,EXPMPA (Cordic.v,38|2): expecting the keyword 'module', 'macromodule' or 'primitive'[A.1].
+ncvlog: *F,NOTOPL: no top-level unit found, must have recursive instances.
+irun: *E,VLGERR: An error occurred during parsing.  Review the log file for errors with the code *E and fix those identified problems to proceed.  Exiting with code (status 2).
+TOOL:	irun(64)	15.20-s086: Exiting on Feb 02, 2024 at 13:26:55 IST  (total: 00:00:00)
