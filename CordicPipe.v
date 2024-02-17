@@ -1,88 +1,169 @@
-module CordicPipe (
-    input clk,
-    input ena,
-    input [WIDTH-1:0] Xi,
-    input [WIDTH-1:0] Yi,
-    input [AWIDTH-1:0] Zi,
-    output reg [WIDTH-1:0] Xo,
-    output reg [WIDTH-1:0] Yo,
-    output reg [AWIDTH-1:0] Zo
-);
-
-// Define functions
-function integer CATAN;
-    input [31:0] n;
-    begin
-        case(n)
-            5'd1: CATAN = 32'h012E40;
-            5'd2: CATAN = 32'h09FB4;
-            5'd3: CATAN = 32'h05111;
-            5'd4: CATAN = 32'h028B1;
-            5'd5: CATAN = 32'h0145D;
-            5'd6: CATAN = 32'h0A2F;
-            5'd7: CATAN = 32'h0518;
-            5'd8: CATAN = 32'h028C;
-            5'd9: CATAN = 32'h0146;
-            5'd10: CATAN = 32'h0A3;
-            5'd11: CATAN = 32'h051;
-            5'd12: CATAN = 32'h029;
-            5'd13: CATAN = 32'h014;
-            5'd14: CATAN = 32'h0A;
-            5'd15: CATAN = 32'h05;
-            5'd16: CATAN = 32'h03;
-            5'd17: CATAN = 32'h01;
-            default: CATAN = 32'h0;
-        endcase
-    end
-endfunction
-
-function [WIDTH-1:0] Delta;
-    input [WIDTH-1:0] Arg;
-    input [31:0] Cnt;
-    begin
-        reg [WIDTH-1:0] tmp;
-        tmp = Arg;
+module cordicpipe(
+        clk,
+        ena,
+        xi,
+        yi,
+        zi,
+        xo,
+        yo,
+        zo
+    );
+    parameter [31:0]width ;
+    parameter [31:0]awidth ;
+    parameter [31:0]pipeid ;
+    input clk;
+    input ena;
+    input [( width - 1 ):0] xi;
+    input [( width - 1 ):0] yi;
+    input [( awidth - 1 ):0] zi;
+    output [( width - 1 ):0] xo;
+    output [( width - 1 ):0] yo;
+    output [( awidth - 1 ):0] zo;
+    wire [( width - 1 ):0] dx;
+    wire [( width - 1 ):0] xresult;
+    wire [( width - 1 ):0] dy;
+    wire [( width - 1 ):0] yresult;
+    wire [( awidth - 1 ):0] atan;
+    wire [( awidth - 1 ):0] zresult;
+    wire yneg;
+    wire ypos;
+    function  Delta_1_32;
+        input arg;
+        input [31:0] cnt;
+        reg tmp;
         integer n;
-        for (n = 1; n <= Cnt; n = n + 1) begin
-            tmp = {tmp[WIDTH-1], tmp[WIDTH-1:1]};
-        end
-        Delta = tmp;
-    end
-endfunction
-
-function [WIDTH-1:0] AddSub;
-    input [WIDTH-1:0] dataa;
-    input [WIDTH-1:0] datab;
-    input add_sub;
     begin
-        if (add_sub == 1'b1) begin
-            AddSub = dataa + datab;
-        end else begin
-            AddSub = dataa - datab;
+        tmp = arg;
+        for ( n = 1 ; ( n <= cnt ) ; n = ( n + 1 ) )
+        begin 
+            tmp = { tmp, tmp };
+        end
+        Delta_1_32 = tmp;
+    end
+    endfunction 
+    function [31:0] CATAN_32;
+        input [31:0] n;
+        integer result;
+    begin
+        case ( n ) 
+        1:
+        begin
+            result = 77376;
+        end
+        2:
+        begin
+            result = 40884;
+        end
+        3:
+        begin
+            result = 20753;
+        end
+        4:
+        begin
+            result = 10417;
+        end
+        5:
+        begin
+            result = 5213;
+        end
+        6:
+        begin
+            result = 2607;
+        end
+        7:
+        begin
+            result = 1304;
+        end
+        8:
+        begin
+            result = 652;
+        end
+        9:
+        begin
+            result = 326;
+        end
+        10:
+        begin
+            result = 163;
+        end
+        11:
+        begin
+            result = 81;
+        end
+        12:
+        begin
+            result = 41;
+        end
+        13:
+        begin
+            result = 20;
+        end
+        14:
+        begin
+            result = 10;
+        end
+        15:
+        begin
+            result = 5;
+        end
+        16:
+        begin
+            result = 3;
+        end
+        17:
+        begin
+            result = 1;
+        end
+        default :
+        begin
+            result = 0;
+        end
+        endcase
+        CATAN_32 = result;
+    end
+    endfunction 
+    function  CONV_UNSIGNED_32_32;
+        input [31:0] arg;
+        input [31:0] size;
+    begin
+    end
+    endfunction 
+    function [1:0] AddSub_1_1_1;
+        input dataa;
+        input datab;
+        input add_sub;
+    begin
+        if ( add_sub == 1'b1 ) 
+        begin
+            AddSub_1_1_1 = ( unsigned'(dataa) + unsigned'(datab) );
+        end
+        else
+        begin 
+            AddSub_1_1_1 = ( unsigned'(dataa) - unsigned'(datab) );
         end
     end
-endfunction
-
-// Define signals
-reg [WIDTH-1:0] dX, Xresult;
-reg [WIDTH-1:0] dY, Yresult;
-reg [AWIDTH-1:0] atan, Zresult;
-reg Yneg, Ypos;
-
-// Architecture body
-always @(posedge clk) begin
-    if (ena == 1'b1) begin
-        dX <= Delta(Xi, PIPEID);
-        dY <= Delta(Yi, PIPEID);
-        atan <= CATAN(PIPEID);
-        Yneg <= Yi[WIDTH-1];
-        Ypos <= ~Yi[WIDTH-1];
-        Xresult <= AddSub(Xi, dY, Ypos);
-        Yresult <= AddSub(Yi, dX, Yneg);
-        Zo <= AddSub(Zi, atan, Ypos);
-        Xo <= Xresult;
-        Yo <= Yresult;
+    endfunction 
+    reg [( width - 1 ):0]xo;
+    reg [( width - 1 ):0]yo;
+    reg [( awidth - 1 ):0]zo;
+    assign dx = Delta_1_32(xi,pipeid);
+    assign dy = Delta_1_32(yi,pipeid);
+    assign atan = CONV_UNSIGNED_32_32(CATAN_32(pipeid),awidth);
+    assign yneg = yi[( width - 1 )];
+    assign ypos =  ~( yi[( width - 1 )]);
+    assign xresult = AddSub_1_1_1(xi,dy,ypos);
+    assign yresult = AddSub_1_1_1(yi,dx,yneg);
+    assign zresult = AddSub_1_1_1(zi,atan,ypos);
+    always @ (  posedge clk)
+    begin : gen_regs
+        if ( clk ) 
+        begin
+            if ( ena == 1'b1 ) 
+            begin
+                xo <= xresult;
+                yo <= yresult;
+                zo <= zresult;
+            end
+        end
     end
-end
-
-endmodule
+endmodule 

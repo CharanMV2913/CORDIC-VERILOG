@@ -1,78 +1,64 @@
-module Cordic (
-    input clk,
-    input ena,
-    input [WIDTH-1:0] Xi,
-    input [WIDTH-1:0] Yi,
-    output reg [WIDTH + EXTEND_PRECISION -1:0] R,
-    output reg [AWIDTH -1:0] A
-);
-
-parameter PIPELINE = 15;
-parameter WIDTH = 16;
-parameter AWIDTH = 16;
-parameter EXTEND_PRECISION = 4;
-parameter ANG = 20;
-parameter PRECISION = WIDTH + EXTEND_PRECISION;
-
-// Define types for arrays
-typedef logic [PRECISION:0] XYVector [0:PIPELINE];
-typedef logic [ANG-1:0] ZVector [0:PIPELINE];
-
-// Define CordicPipe module
-module CordicPipe (
-    input clk,
-    input ena,
-    input [PRECISION:0] Xi,
-    input [PRECISION:0] Yi,
-    input [ANG-1:0] Zi,
-    output reg [PRECISION:0] Xo,
-    output reg [PRECISION:0] Yo,
-    output reg [ANG-1:0] Zo
-);
-
-// CordicPipe implementation goes here...
-
-endmodule
-
-// Define signals
-reg [PRECISION:0] X [0:PIPELINE];
-reg [PRECISION:0] Y [0:PIPELINE];
-reg [ANG-1:0] Z [0:PIPELINE];
-
-// Architecture body
-initial begin
-    // Fill first nodes
-    X[0][PRECISION:EXTEND_PRECISION] = {1'b0, Xi}; // fill msb of X0
-    for (int n = EXTEND_PRECISION - 1; n >= 0; n = n - 1) begin
-        X[0][n] = 1'b0; // fill lsb with '0'
-    end
-
-    Y[0][PRECISION:EXTEND_PRECISION] = {Yi[WIDTH - 1], Yi}; // fill msb of Y0
-    for (int n = EXTEND_PRECISION - 1; n >= 0; n = n - 1) begin
-        Y[0][n] = 1'b0; // fill lsb with '0'
-    end
-
-    for (int n = ANG - 1; n >= 0; n = n - 1) begin
-        Z[0][n] = 1'b0; // fill Z with '0'
-    end
-
-    // Generate pipeline
-    for (int n = 1; n <= PIPELINE; n = n + 1) begin
-        CordicPipe Pipe (
-            .clk(clk),
-            .ena(ena),
-            .Xi(X[n-1]),
-            .Yi(Y[n-1]),
-            .Zi(Z[n-1]),
-            .Xo(X[n]),
-            .Yo(Y[n]),
-            .Zo(Z[n])
-        );
-    end
-
-    // Assign outputs
-    R = X[PIPELINE][PRECISION-1:0];
-    A = Z[PIPELINE][ANG-1:ANG-AWIDTH];
-end
-
-endmodule
+module cordic(
+        clk,
+        ena,
+        xi,
+        yi,
+        r,
+        a
+    );
+    parameter [31:0]pipeline  = 15;
+    parameter [31:0]width  = 16;
+    parameter [31:0]awidth  = 16;
+    parameter [31:0]extend_precision  = 4;
+    input clk;
+    input ena;
+    input [( width - 1 ):0] xi;
+    input [( width - 1 ):0] yi;
+    output [( width - 1 ):0] r;
+    output [( awidth - 1 ):0] a;
+    wire [pipeline:0] x;
+    wire [pipeline:0] y;
+    wire [pipeline:0] z;
+    genvar n;
+    assign x[( width + extend_precision ):extend_precision] = { 1'b0, xi };
+    generate
+        for ( n = ( extend_precision - 1 ) ; ( n >= 0 ) ; n = ( n - 1 ) )
+        begin : fill_x
+            assign x[0][n] = 1'b0;
+        end
+    endgenerate
+    assign y[( width + extend_precision ):extend_precision] = { yi[( width - 1 )], yi };
+    generate
+        for ( n = ( extend_precision - 1 ) ; ( n >= 0 ) ; n = ( n - 1 ) )
+        begin : fill_y
+            assign y[0][n] = 1'b0;
+        end
+    endgenerate
+    generate
+        for ( n = ( 20 - 1 ) ; ( n >= 0 ) ; n = ( n - 1 ) )
+        begin : fill_z
+            assign z[0][n] = 1'b0;
+        end
+    endgenerate
+    generate
+        for ( n = 1 ; ( n <= pipeline ) ; n = ( n + 1 ) )
+        begin : gen_pipe
+            cordicpipe #(
+                    .width(( ( width + extend_precision ) + 1 )),
+                    .awidth(20),
+                    .pipeid(n)
+                ) pipe (
+                    .clk(clk),
+                    .ena(ena),
+                    .xi(x[( n - 1 )]),
+                    .yi(y[( n - 1 )]),
+                    .zi(z[( n - 1 )]),
+                    .xo(x[n]),
+                    .yo(y[n]),
+                    .zo(z[n])
+                );
+        end
+    endgenerate
+    assign r = x;
+    assign a = z[19:( 20 - awidth )];
+endmodule 
