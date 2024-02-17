@@ -1,4 +1,4 @@
-module corproc (
+module cordicProc (
     input clk,
     input ena,
     input signed [15:0] Xin,
@@ -8,51 +8,6 @@ module corproc (
 );
 
 parameter PipeLength = 15;
-
-// Pre component
-module pre (
-    input clk,
-    input ena,
-    input signed [15:0] Xi,
-    input signed [15:0] Yi,
-    output reg [15:0] Xo,
-    output reg [15:0] Yo,
-    output reg [2:0] Q
-);
-
-// Pre implementation goes here...
-
-endmodule
-
-// Cordic component
-module cordic (
-    input clk,
-    input ena,
-    input [15:0] Xi,
-    input [15:0] Yi,
-    output reg [19:0] R,
-    output reg [15:0] A
-);
-
-// Cordic implementation goes here...
-
-endmodule
-
-// Post component
-module post (
-    input clk,
-    input ena,
-    input [15:0] Ai,
-    input [19:0] Ri,
-    input [2:0] Qi,
-    output reg [15:0] Ao,
-    output reg [19:0] Ro
-);
-
-// Post implementation goes here...
-
-endmodule
-
 // Define signals
 reg [15:0] Xpre, Ypre, Acor;
 reg [19:0] Rcor;

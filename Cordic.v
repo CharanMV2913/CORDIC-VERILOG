@@ -18,22 +18,6 @@ parameter PRECISION = WIDTH + EXTEND_PRECISION;
 typedef logic [PRECISION:0] XYVector [0:PIPELINE];
 typedef logic [ANG-1:0] ZVector [0:PIPELINE];
 
-// Define CordicPipe module
-module CordicPipe (
-    input clk,
-    input ena,
-    input [PRECISION:0] Xi,
-    input [PRECISION:0] Yi,
-    input [ANG-1:0] Zi,
-    output reg [PRECISION:0] Xo,
-    output reg [PRECISION:0] Yo,
-    output reg [ANG-1:0] Zo
-);
-
-// CordicPipe implementation goes here...
-
-endmodule
-
 // Define signals
 reg [PRECISION:0] X [0:PIPELINE];
 reg [PRECISION:0] Y [0:PIPELINE];
